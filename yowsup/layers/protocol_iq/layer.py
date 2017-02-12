@@ -51,6 +51,7 @@ class YowIqProtocolLayer(YowProtocolLayer):
         self._pingQueue[id] = None
         pingQueueSize = len(self._pingQueue)
         self._pingQueueLock.release()
+        print(self._pingQueue)
         self.__logger.debug("ping queue size: %d" % pingQueueSize)
         if pingQueueSize >= 2:
             self.getStack().broadcastEvent(YowLayerEvent(YowNetworkLayer.EVENT_STATE_DISCONNECT, reason = "Ping Timeout"))

@@ -123,12 +123,14 @@ class AxolotlReceivelayer(AxolotlBaseLayer):
         preKeyWhisperMessage = PreKeyWhisperMessage(serialized=enc.getData())
         sessionCipher = self.getSessionCipher(pkMessageProtocolEntity.getAuthor(False))
         plaintext = sessionCipher.decryptPkmsg(preKeyWhisperMessage)
-        if enc.getVersion() == 2:
-            paddingByte = plaintext[-1] if type(plaintext[-1]) is int else ord(plaintext[-1])
-            padding = paddingByte & 0xFF
-            self.parseAndHandleMessageProto(pkMessageProtocolEntity, plaintext[:-padding])
-        else:
-            self.handleConversationMessage(node, plaintext)
+        # if enc.getVersion() == 2:
+        #     paddingByte = plaintext[-1] if type(plaintext[-1]) is int else ord(plaintext[-1])
+        #     padding = paddingByte & 0xFF
+        #     self.parseAndHandleMessageProto(pkMessageProtocolEntity, plaintext[:-padding])
+        # else:
+        paddingByte = plaintext[-1] if type(plaintext[-1]) is int else ord(plaintext[-1])
+        padding = paddingByte & 0xFF
+        self.handleConversationMessage(node, plaintext[2:-padding])
 
     def handleWhisperMessage(self, node):
         encMessageProtocolEntity = EncryptedMessageProtocolEntity.fromProtocolTreeNode(node)
@@ -138,12 +140,15 @@ class AxolotlReceivelayer(AxolotlBaseLayer):
         sessionCipher = self.getSessionCipher(encMessageProtocolEntity.getAuthor(False))
         plaintext = sessionCipher.decryptMsg(whisperMessage)
 
-        if enc.getVersion() == 2:
-            paddingByte = plaintext[-1] if type(plaintext[-1]) is int else ord(plaintext[-1])
-            padding = paddingByte & 0xFF
-            self.parseAndHandleMessageProto(encMessageProtocolEntity, plaintext[:-padding])
-        else:
-            self.handleConversationMessage(encMessageProtocolEntity.toProtocolTreeNode(), plaintext)
+        paddingByte = plaintext[-1] if type(plaintext[-1]) is int else ord(plaintext[-1])
+        padding = paddingByte & 0xFF
+
+        # if enc.getVersion() == 2:
+        #     paddingByte = plaintext[-1] if type(plaintext[-1]) is int else ord(plaintext[-1])
+        #     padding = paddingByte & 0xFF
+        #     self.parseAndHandleMessageProto(encMessageProtocolEntity, plaintext[:-padding])
+        # else:
+        self.handleConversationMessage(encMessageProtocolEntity.toProtocolTreeNode(), plaintext[2:-padding])
 
     def handleSenderKeyMessage(self, node):
         encMessageProtocolEntity = EncryptedMessageProtocolEntity.fromProtocolTreeNode(node)

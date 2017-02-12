@@ -37,6 +37,10 @@ class YowMediaProtocolLayer(YowProtocolLayer):
     def recvMessageStanza(self, node):
         if node.getAttributeValue("type") == "media":
             mediaNode = node.getChild("media")
+
+            if not mediaNode:
+                return
+
             if mediaNode.getAttributeValue("type") == "image":
                 entity = ImageDownloadableMediaMessageProtocolEntity.fromProtocolTreeNode(node)
                 self.toUpper(entity)
